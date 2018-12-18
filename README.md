@@ -23,6 +23,8 @@ make
 ./build/bin/mobileNet
 ```
 
+![image](mobileNet_screenshot_17.12.2018.png)
+
 ---
 
 **Reference:**
@@ -44,6 +46,3 @@ I retrianed mobileNet-SSD,my number of classfication is 5
 - [ ] The bottleneck of time cost lies in the decoding of pictures. "imread" cost too much ,to resolve it.
 - [ ] To modify the architecture, decrease the time cost
 
-**The bug has been fixed**
-
-![image](testPic/test1.png)

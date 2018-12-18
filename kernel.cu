@@ -2,7 +2,7 @@
  * http://github.com/dusty-nv/jetson-inference
  */
 
-#include "cuda/cudaUtility.h"
+#include "cudaUtility.h"
 #include <iostream>
 
 

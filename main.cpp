@@ -27,7 +27,7 @@ public:
         end_ = std::chrono::high_resolution_clock::now();
         start_ticking_ = false;
         t = std::chrono::duration<double, std::milli>(end_ - start_).count();
-        //std::cout << "Time: " << t << " ms" << std::endl;
+        std::cout << "Time: " << t << " ms" << std::endl;
     }
     double t;
 private:
@@ -105,29 +105,33 @@ int main(int argc, char *argv[])
     Timer timer;
 
     std::string imgFile = "../../testPic/test.jpg";
-
     frame = cv::imread(imgFile);
+    if (frame.empty())
+    {
+        cout <<"Could not find the image."<<endl;
+        return 0;
+    }
+
     srcImg = frame.clone();
-    cv::resize(frame, frame, cv::Size(300,300));
+    cv::resize(frame, frame, cv::Size(height,width));
     const size_t size = width * height * sizeof(float3);
 
     if( CUDA_FAILED( cudaMalloc( &imgCUDA, size)) )
     {
         cout <<"Cuda Memory allocation error occured."<<endl;
-        return false;
+        return 0;
     }
 
     void* imgData = malloc(size);
     memset(imgData,0,size);
 
+    timer.tic();
     loadImg(frame,height,width,(float*)imgData,make_float3(127.5,127.5,127.5),0.007843);
     cudaMemcpyAsync(imgCUDA,imgData,size,cudaMemcpyHostToDevice);
 
     void* buffers[] = { imgCUDA, output };
 
-    timer.tic();
     tensorNet.imageInference( buffers, output_vector.size() + 1, BATCH_SIZE);
-    timer.toc();
     double msTime = timer.t;
 
     vector<vector<float> > detections;
@@ -150,6 +154,7 @@ int main(int argc, char *argv[])
         cv::rectangle(srcImg,cv::Rect2f(cv::Point(x1,y1),cv::Point(x2,y2)),cv::Scalar(255,0,255),1);
 
     }
+    timer.toc();
     cv::imshow("mobileNet",srcImg);
     cv::waitKey(0);
     free(imgData);
